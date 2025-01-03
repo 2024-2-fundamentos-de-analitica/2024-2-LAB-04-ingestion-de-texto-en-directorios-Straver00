@@ -5,6 +5,11 @@
 Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 """
 
+import pandas as pd 
+import zipfile
+import os
+
+
 
 def pregunta_01():
     """
@@ -71,3 +76,32 @@ def pregunta_01():
 
 
     """
+    # Descomprimir archivo
+    with zipfile.ZipFile("files/input.zip", 'r') as zip_ref:
+        zip_ref.extractall("input")
+        
+    # Crear dataframe train
+    datatrain = []
+    for sentiment in ["negative", "positive", "neutral"]:
+        path = f"input/input/train/{sentiment}"
+        for file in os.listdir(path):
+            with open(f"{path}/{file}", "r") as f:
+                datatrain.append([f.read(), sentiment])
+    # Crear dataframe test
+    datatest = []
+    for sentiment in ["negative", "positive", "neutral"]:
+        path = f"input/input/test/{sentiment}"
+        for file in os.listdir(path):
+            with open(f"{path}/{file}", "r") as f:
+                datatest.append([f.read(), sentiment])
+
+    dfTrain= pd.DataFrame(datatrain, columns=["phrase", "target"])
+    dfText = pd.DataFrame(datatest, columns=["phrase", "target"])
+
+    # Guardar dataframes
+    os.makedirs("files/output", exist_ok=True)
+    dfTrain.to_csv("files/output/train_dataset.csv", index=False)
+    dfText.to_csv("files/output/test_dataset.csv", index=False)
+
+
+pregunta_01()
